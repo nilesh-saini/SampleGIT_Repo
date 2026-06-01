@@ -7,37 +7,36 @@ pipeline {
 
     stages {
 
-        stage('Build Start Notification') {
-            steps {
-                script {
-                    emailext(
-                        subject: "Jenkins Build Started: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Build has started.
-
-                            Job Name: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                            Build URL: ${env.BUILD_URL}
-
-                            Triggered by: ${currentBuild.getBuildCauses()}
-                        """,
-                        to: "${EMAIL_RECIPIENTS}"
-                    )
-                }
-            }
-        }
+        
         stage('Build') {
             steps {
               echo " build step"
                 }
             }
-              stage('test') {
+
+        stage('Checkout Source') {
+            steps {
+                checkout scm
+            }
+        }
+
+        
+        stage('test') {
             steps {
               echo " test step"
                 }
             }
+        
+        stage('List Git Files') {
+            steps{
+                echo "Listing all files and directories in workspace"
+                sh '''
+                    ls -lrt
+                '''
+            }
+        }
 
-              stage('deploy') {
+        stage('deploy') {
             steps {
               echo " deploy step"
                 }
