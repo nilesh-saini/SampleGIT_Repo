@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        tar -czf /tmp/src.zip
+                        tar -czf src /tmp/src.zip
                         ls -lrt
                         ls -lrt /tmp/src/zip
                     '''
