@@ -41,9 +41,9 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    zip -r ${ZIP_NAME} . \
-                            -x "*.git*" \
-                            -x "${ZIP_NAME}"
+                        tar -czf /tmp/src.zip
+                        ls -lrt
+                        ls -lrt /tmp/src/zip
                     '''
                 }
             }
