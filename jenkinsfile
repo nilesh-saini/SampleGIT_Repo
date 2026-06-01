@@ -1,121 +1,27 @@
 pipeline {
     agent any
 
-    environment {
-        EMAIL_RECIPIENTS = 'nilesh.saini@gmail.com'
-        ZIP_NAME = "SOURCE_${BUILD_NUMBER}.zip"
-    }
-
     stages {
 
-        stage('Build Start Notification') {
+        stage('build') {
             steps {
-                script {
-                    emailext(
-                        subject: "Jenkins Build Started: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Build has started.
-
-                            Job Name: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                            Build URL: ${env.BUILD_URL}
-
-                            Triggered by: ${currentBuild.getBuildCauses()}
-                        """,
-                        to: "${EMAIL_RECIPIENTS}"
-                    )
-                }
+            echo "Build step
             }
         }
 
-        stage('Checkout Source') {
+        stage('test') {
             steps {
-                checkout scm
+            echo "test step
             }
         }
 
-        stage('List Git Files') {
-            steps {
-                script {
-                    echo "Listing all files and directories in workspace"
 
-                    if (isUnix()) {
-                        sh '''
-                            echo "===== FILES AND FOLDERS ====="
-                            find . -type f
-                            echo ""
-                            echo "===== DIRECTORY STRUCTURE ====="
-                            find . -type d
-                        '''
-                    } else {
-                        bat '''
-                            echo ===== FILES AND FOLDERS =====
-                            dir /s /b
-                        '''
-                    }
-                }
+        stage('deploy') {
+            steps {
+            echo "deploy step
             }
         }
 
-        stage('Create ZIP Archive') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh """
-                            zip -r ${ZIP_NAME} . \
-                            -x "*.git*" \
-                            -x "${ZIP_NAME}"
-                        """
-                    } else {
-                        powershell """
-                            Compress-Archive -Path * -DestinationPath ${ZIP_NAME} -Force
-                        """
-                    }
 
-                    echo "ZIP created: ${ZIP_NAME}"
-                }
-            }
-        }
-
-        stage('Archive ZIP') {
-            steps {
-                archiveArtifacts artifacts: "${ZIP_NAME}", fingerprint: true
-            }
-        }
-    }
-
-    post {
-        success {
-            emailext(
-                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    Build completed successfully.
-
-                    Job: ${env.JOB_NAME}
-                    Build: ${env.BUILD_NUMBER}
-                    URL: ${env.BUILD_URL}
-                """,
-                attachmentsPattern: "${ZIP_NAME}",
-                to: "${EMAIL_RECIPIENTS}"
-            )
-        }
-
-        failure {
-            emailext(
-                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    Build failed.
-
-                    Job: ${env.JOB_NAME}
-                    Build: ${env.BUILD_NUMBER}
-                    URL: ${env.BUILD_URL}
-                """,
-                to: "${EMAIL_RECIPIENTS}"
-            )
-        }
-
-        always {
-            cleanWs()
-        }
     }
 }
