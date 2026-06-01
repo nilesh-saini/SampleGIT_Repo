@@ -31,8 +31,21 @@ pipeline {
             steps{
                 echo "Listing all files and directories in workspace"
                 sh '''
+                    echo "===== FILES AND FOLDERS ====="
                     ls -lrt
                 '''
+            }
+        }
+
+        stage('Create ZIP Archive') {
+            steps {
+                script {
+                    sh '''
+                    zip -r ${ZIP_NAME} . \
+                            -x "*.git*" \
+                            -x "${ZIP_NAME}"
+                    '''
+                }
             }
         }
 
